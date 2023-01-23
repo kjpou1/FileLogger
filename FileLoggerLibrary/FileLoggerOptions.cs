@@ -60,6 +60,15 @@ public class FileLoggerOptions
     public bool MultiLineFormat { get; set; } = false;
 
     /// <summary>
+    /// Whether to append to the existing log file or overwrite 
+    /// an existing file if it exists.
+    /// <remarks>
+    /// By default, appending to the already existing log files
+    /// </remarks>
+    /// </summary>
+    public bool Append { get; set; } = true;
+
+    /// <summary>
     /// Determines if multiline messages (messages that contain \n),
     /// should be indented to align with the log message header.
     /// <remarks>

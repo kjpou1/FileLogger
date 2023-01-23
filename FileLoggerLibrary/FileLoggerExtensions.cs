@@ -134,6 +134,13 @@ public static class FileLoggerExtensions
             options.MultiLineFormat = multiLine;
         }
 
+        string append = fileLogger["Append"];
+
+        if (string.IsNullOrWhiteSpace(append) == false && bool.TryParse(append, out bool appendTo))
+        {
+            options.Append = appendTo;
+        }
+
         string indentMultilineMessages = fileLogger["IndentMultilineMessages"];
 
         if (string.IsNullOrWhiteSpace(indentMultilineMessages) == false && bool.TryParse(indentMultilineMessages, out bool indent))

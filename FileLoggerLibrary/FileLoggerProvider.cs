@@ -23,6 +23,7 @@ internal class FileLoggerProvider : ILoggerProvider, IDisposable
     public long LogMaxBytes { get; private set; } = 50 * 1048576;
     public uint LogMaxCount { get; private set; } = 10;
     public LogLevel LogMinLevel { get; private set; } = LogLevel.Trace;
+    public bool Append { get; set; } = true;
     public bool MultiLineFormat { get; set; } = false;
     public bool IndentMultilineMessages { get; set; } = true;
     public bool ConsoleLogging { get; set; } = true;
@@ -64,6 +65,7 @@ internal class FileLoggerProvider : ILoggerProvider, IDisposable
                               uint logMaxCount = 10,
                               LogLevel logMinLevel = LogLevel.Trace,
                               bool multiLineFormat = false,
+                              bool append = true,
                               bool indentMultilineMessages = true,
                               bool consoleLogging = true,
                               bool enableConsoleColors = true,
@@ -75,6 +77,7 @@ internal class FileLoggerProvider : ILoggerProvider, IDisposable
                                   LogMaxCount = logMaxCount,
                                   LogMinLevel = logMinLevel,
                                   MultiLineFormat = multiLineFormat,
+                                  Append = append,
                                   IndentMultilineMessages = indentMultilineMessages,
                                   ConsoleLogging = consoleLogging,
                                   EnableConsoleColors = enableConsoleColors,
@@ -110,6 +113,7 @@ internal class FileLoggerProvider : ILoggerProvider, IDisposable
         LogMaxCount = options.LogMaxCount;
         LogMinLevel = options.LogMinLevel;
         MultiLineFormat = options.MultiLineFormat;
+        Append = options.Append;
         IndentMultilineMessages = options.IndentMultilineMessages;
         ConsoleLogging = options.ConsoleLogging;
         EnableConsoleColors = options.EnableConsoleColors;
@@ -369,7 +373,8 @@ internal class FileLoggerProvider : ILoggerProvider, IDisposable
         IncrementLog();
 
         // Append the log file.
-        _logStream = new FileStream(LogFilename, FileMode.Append, FileAccess.Write, FileShare.Read);
+        FileMode fileMode = Append ? FileMode.Append : FileMode.Create;
+        _logStream = new FileStream(LogFilename, fileMode, FileAccess.Write, FileShare.Read);
         _logWriter = new StreamWriter(_logStream)
         {
             AutoFlush = true
