@@ -6,51 +6,51 @@ namespace FileLoggerLibrary;
 
 public static class FileLoggerExtensions
 {
-    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name)
+    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, bool append = true)
     {
-        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name));
+        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, append: append));
         builder.SetMinimumLevel(LogLevel.Trace);
         return builder;
     }
 
-    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, LogLevel minLevel)
+    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, LogLevel minLevel, bool append = true)
     {
-        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name));
+        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, append: append));
         builder.SetMinimumLevel(minLevel);
         return builder;
     }
 
-    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder)
+    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, bool append = true)
     {
-        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder));
+        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, append: append));
         builder.SetMinimumLevel(LogLevel.Trace);
         return builder;
     }
     
-    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, LogLevel minLevel)
+    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, LogLevel minLevel, bool append = true)
     {
-        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder));
+        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, append: append));
         builder.SetMinimumLevel(minLevel);
         return builder;
     }
 
-    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, long maxBytes)
+    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, long maxBytes, bool append = true)
     {
-        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, maxBytes));
+        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, maxBytes, append: append));
         builder.SetMinimumLevel(LogLevel.Trace);
         return builder;
     }
 
-    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, long maxBytes, uint maxCount)
+    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, long maxBytes, uint maxCount, bool append = true)
     {
-        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, maxBytes, maxCount));
+        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, maxBytes, maxCount, append: append));
         builder.SetMinimumLevel(LogLevel.Trace);
         return builder;
     }
 
-    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, long maxBytes, uint maxCount, LogLevel minLevel)
+    public static ILoggingBuilder AddFileLogger(this ILoggingBuilder builder, string name, string folder, long maxBytes, uint maxCount, LogLevel minLevel, bool append = true)
     {
-        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, maxBytes, maxCount, minLevel));
+        builder.Services.AddSingleton<ILoggerProvider, FileLoggerProvider>(sp => new FileLoggerProvider(name, folder, maxBytes, maxCount, minLevel, append: append));
         builder.SetMinimumLevel(minLevel);
         return builder;
     }
