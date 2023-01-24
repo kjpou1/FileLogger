@@ -6,7 +6,7 @@ namespace FileLoggerLibrary;
 
 [UnsupportedOSPlatform("browser")]
 [ProviderAlias("FileLogger")]
-internal class FileLoggerProvider : ILoggerProvider, IDisposable
+public class FileLoggerProvider : ILoggerProvider, IDisposable
 {
     private readonly ConcurrentDictionary<string, FileLogger> _loggers =  new(StringComparer.OrdinalIgnoreCase);
     private readonly BlockingCollection<LogMessage> _messageQueue = new(1024);
@@ -380,6 +380,46 @@ internal class FileLoggerProvider : ILoggerProvider, IDisposable
             AutoFlush = true
         };
     }
+
+    /// <summary>
+    /// Opens a new log file or resumes an existing one.
+    /// </summary>
+    public void ChangeLoggingDestination(string logName, string logFolder = "")
+    {
+        if (string.IsNullOrWhiteSpace(logFolder))
+        {
+            logFolder = LogFolder;
+        }
+
+        if (logName == LogName && logFolder == LogFolder)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(logFolder))
+        {
+            LogFolder = Path.Combine(Environment.CurrentDirectory, "log");
+        }
+        else if (Directory.Exists(logFolder) == false)
+        {
+            LogFolder = logFolder;
+        }
+        else
+        {
+            LogFolder = logFolder;
+        }
+
+        Directory.CreateDirectory(LogFolder);
+        LogName = logName;
+        _rollMode = false;  // start over with rollMode scenario on change
+
+
+        // lets flush it just to make sure
+        _logWriter.Flush();
+
+        Open();
+    }
+
 
     /// <summary>
     /// Privately sets 'LogFilename' with next available increment in the
