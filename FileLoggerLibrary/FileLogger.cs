@@ -7,6 +7,25 @@ internal class FileLogger : ILogger
     private readonly FileLoggerProvider _fileLoggerProvider;
     private readonly string _categoryName;
 
+    private object currentScopeState = null;
+
+    private sealed class Scope : IDisposable
+    {
+        private FileLogger FileLogger {get;}
+
+        public Scope(FileLogger fileLogger, object state)
+        {
+            FileLogger = fileLogger;
+            FileLogger.currentScopeState = state;
+        }
+
+        public void Dispose()
+        {
+            FileLogger.currentScopeState = null;
+        }
+    }
+
+
     /// <summary>
     /// Default constructor for a FileLogger object.
     /// </summary>
@@ -42,8 +61,9 @@ internal class FileLogger : ILogger
     /// <param name="state">The entry to be written. Can be also an object.</param>
     /// <returns>A disposable object that ends the logical operation scope on dispose.</returns>
     public IDisposable BeginScope<TState>(TState state)
+        where TState : notnull
     {
-        return null;
+        return new Scope(this, state);
     }
 
     /// <summary>
@@ -65,6 +85,7 @@ internal class FileLogger : ILogger
 
         ArgumentNullException.ThrowIfNull(nameof(formatter));
         string message = formatter(state, exception);
-        _fileLoggerProvider.EnqueueMessage(new LogMessage(message, exception, logLevel, _categoryName, eventId));
+        _fileLoggerProvider.EnqueueMessage(new LogMessage(message, exception, logLevel, _categoryName, eventId, currentScopeState));
     }
 }
+

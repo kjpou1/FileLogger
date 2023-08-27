@@ -12,12 +12,13 @@ public class LogMessage
     public string TimeStamp { get; init; }
     public string Header { get; init; }
     public string PaddedMessage { get; init; }
+    public object ScopeState { get; init; }
 
     /// <summary>
     /// Default constructor, builds a log message and publishes properties
     /// for each distinct part of the message structure.
     /// </summary>
-    public LogMessage(string message, Exception exception, LogLevel logLevel, string categoryName, EventId eventId)
+    public LogMessage(string message, Exception exception, LogLevel logLevel, string categoryName, EventId eventId, object scopeState)
     {
         Message = message;
         Exception = exception;
@@ -25,18 +26,23 @@ public class LogMessage
         CategoryName = categoryName;
         EventId = eventId;
         TimeStamp = DateTime.Now.ToString("yyyy-MM-dd--HH.mm.ss");
+        ScopeState = scopeState;
         Header = $"{TimeStamp}|{LogLevelToString(logLevel)}|{categoryName}|";
+        if (ScopeState is not null)
+        {
+            Header = $"{TimeStamp}|{LogLevelToString(logLevel)}|{ScopeState}|{categoryName}|";
+        }
         
         if (eventId.Id != 0) 
         { 
             Message += $" [{eventId.Id}]"; 
         }
 
-        if (exception != null && message.Length > 0)
+        if (exception is not null && message.Length > 0)
         {
             Message += $" [{exception.Message}]";
         }
-        else if (exception != null && message.Length == 0)
+        else if (exception is not null && message.Length == 0)
         {
             Message = exception.Message;
         }
@@ -51,32 +57,17 @@ public class LogMessage
     /// <returns>String representation of the log level.</returns>
     internal static string LogLevelToString(LogLevel logLevel)
     {
-        string result = "";
-
-        switch (logLevel)
+        string result = logLevel switch
         {
-            case LogLevel.Trace:
-                result += "TRCE";
-                break;
-            case LogLevel.Warning:
-                result += "WARN";
-                break;
-            case LogLevel.Debug:
-                result += "DBUG";
-                break;
-            case LogLevel.Information:
-                result += "INFO";
-                break;
-            case LogLevel.Error:
-                result += "ERRR";
-                break;
-            case LogLevel.Critical:
-                result += "CRIT";
-                break;
-            case LogLevel.None:
-                result += "    ";
-                break;
-        }
+            LogLevel.Trace => "TRCE",
+            LogLevel.Warning => "WARN",
+            LogLevel.Debug => "DBUG",
+            LogLevel.Information => "INFO",
+            LogLevel.Error => "ERRR",
+            LogLevel.Critical => "CRIT",
+            LogLevel.None => "    ",
+            _ => throw new NotImplementedException(),
+        };
 
         return result;
     }

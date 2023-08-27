@@ -145,31 +145,35 @@ public class FileLoggerProvider : ILoggerProvider, IDisposable
     {
         foreach (LogMessage message in _messageQueue.GetConsumingEnumerable())
         {
-            long logSizeBytes = new FileInfo(LogFilename).Length;
-
-            if (logSizeBytes >= LogMaxBytes)
+            // Check if null in case the the log file was closed
+            if (LogFilename is not null)
             {
-                Open();
-            }
+                long logSizeBytes = new FileInfo(LogFilename).Length;
 
-            lock (_lockObj)
-            {
-                if (LogEntryFormatter != null)
+                if (logSizeBytes >= LogMaxBytes)
                 {
-                    if (ConsoleLogging)
+                    Open();
+                }
+
+                lock (_lockObj)
+                {
+                    if (LogEntryFormatter != null)
                     {
-                        Console.WriteLine(LogEntryFormatter(message));
-                    }
+                        if (ConsoleLogging)
+                        {
+                            Console.WriteLine(LogEntryFormatter(message));
+                        }
 
-                    _logWriter.WriteLine(LogEntryFormatter(message));
-                }
-                else if (MultiLineFormat)
-                {
-                    WriteMultiLineFormatMessage(message);
-                }
-                else
-                {
-                    WriteSingleLineFormatMessage(message);
+                        _logWriter.WriteLine(LogEntryFormatter(message));
+                    }
+                    else if (MultiLineFormat)
+                    {
+                        WriteMultiLineFormatMessage(message);
+                    }
+                    else
+                    {
+                        WriteSingleLineFormatMessage(message);
+                    }
                 }
             }
         }
@@ -513,6 +517,26 @@ public class FileLoggerProvider : ILoggerProvider, IDisposable
         }
     }
 
+    /// <summary>
+    /// Flushes the log file
+    /// </summary>
+    /// <returns>Returns true if the log file successfully flushed, false otherwise.</returns>
+    public bool Flush()
+    {
+        try
+        {
+            lock (_lockObj)
+            {
+                // Don't call Log() here, this will result in a -=#StackOverflow#=-.
+                _logWriter.Flush();
+                return true;
+            }
+        }
+        catch (Exception)
+        {
+            return false;
+        }
+    }
     /// <summary>
     /// Dispose resources.
     /// </summary>
